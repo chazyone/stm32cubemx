@@ -60,59 +60,136 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN 0 */
 int fputc(int ch, FILE *f)
 {
-	HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, 1000);
+	HAL_UART_Transmit(&huart2, (uint8_t *)&ch, 1, 1000);
 	return ch;
 }
 
 int fgetc(FILE *f)
 {
 	int ch = -1;
-	HAL_UART_Receive(&huart1,(uint8_t *)&ch, sizeof(ch), 1000);
+	HAL_UART_Receive(&huart2,(uint8_t *)&ch, sizeof(ch), 1000);
 	return ch;
 }
-//can ¹ýÂËÆ÷ÉèÖÃ
-void CAN_Filter_Init(CAN_HandleTypeDef *canHandle)
+
+void Can_Send_Msg(uint8_t *msg, uint8_t len)
 {
-	CAN_FilterTypeDef CAN_FilterInit;
-	CAN_FilterInit.FilterBank = 0;
-	CAN_FilterInit.FilterMode = CAN_FILTERMODE_IDMASK;
-	CAN_FilterInit.FilterScale = CAN_FILTERSCALE_32BIT;
-	CAN_FilterInit.FilterIdHigh = 0x0000;
-	CAN_FilterInit.FilterIdLow = 0x0000;
-	CAN_FilterInit.FilterMaskIdHigh = 0x0000;
-	CAN_FilterInit.FilterMaskIdLow = 0x0000;
-	CAN_FilterInit.FilterFIFOAssignment = CAN_FILTER_FIFO0;
-	CAN_FilterInit.FilterActivation = CAN_FILTER_ENABLE;
-	
-	
-	HAL_CAN_ConfigFilter(canHandle, &CAN_FilterInit);
-}
-uint8_t Can_Send_Msg(uint8_t *msg, uint8_t len)
-{
-	uint8_t mbox;
-	uint16_t i=0;
 	CAN_TxHeaderTypeDef CAN_Header;
+	uint16_t SendTimes, SendCNT=0;
+	uint8_t FreeTxNum=0;
 	
 	CAN_Header.StdId = 0x12;
 	CAN_Header.ExtId = 0x12;
 	CAN_Header.IDE = CAN_ID_STD;
 	CAN_Header.RTR = CAN_RTR_DATA;
-	CAN_Header.DLC = len;
+	CAN_Header.DLC = 8;
 	
+	SendTimes=len/8+(len%8?1:0);
+	FreeTxNum = HAL_CAN_GetTxMailboxesFreeLevel(&hcan1);
 	
-	if(HAL_CAN_AddTxMessage(&hcan1, &CAN_Header, msg, (uint32_t *)CAN_TX_MAILBOX0) != HAL_OK)
+	while(SendTimes--)
 	{
-		Error_Handler();
+		if(0 == SendTimes)
+		{
+			if(len%8)
+				CAN_Header.DLC=len%8;
+		}
+		while(0==FreeTxNum)
+		{
+			FreeTxNum = HAL_CAN_GetTxMailboxesFreeLevel(&hcan1);
+		}
+		HAL_Delay(1);
+		if(HAL_CAN_AddTxMessage(&hcan1, &CAN_Header, msg, (uint32_t *)CAN_TX_MAILBOX0) != HAL_OK)
+		{
+			Error_Handler();
+		}
+		SendCNT+=8;
 	}
 }
+void Can_Send_8BitMsg()
+{
+	CAN_TxHeaderTypeDef TxHeader;
+	uint8_t TxData[8] = {0x23, 0x81, 0x60, 0x00, 0x55, 0x55, 0x08, 0x00};
+	uint32_t TxMailbox; 
+	uint32_t std_id = 0x601;  
 
+	TxHeader.RTR = CAN_RTR_DATA;
+	TxHeader.IDE = CAN_ID_STD;            
+	TxHeader.StdId=std_id;
+	TxHeader.TransmitGlobalTime = DISABLE;
+	TxHeader.DLC = 8;
+					
+	if (HAL_CAN_AddTxMessage(&hcan1, &TxHeader, TxData, &TxMailbox) != HAL_OK)
+	{
+		 /* Transmission request Error */
+		 Error_Handler();
+	}
+	
+}
+
+void CAN_Filters_Init(void)
+{
+	CAN_FilterTypeDef CAN_FilterInit1;
+	
+	CAN_FilterInit1.FilterBank = 14;
+	CAN_FilterInit1.FilterMode = CAN_FILTERMODE_IDMASK;
+	CAN_FilterInit1.FilterScale = CAN_FILTERSCALE_32BIT;
+	CAN_FilterInit1.FilterIdHigh = 0x0000;
+	CAN_FilterInit1.FilterIdLow = 0x0000;
+	CAN_FilterInit1.FilterMaskIdHigh = 0x0000;
+	CAN_FilterInit1.FilterMaskIdLow = 0x0000;
+	CAN_FilterInit1.FilterFIFOAssignment = CAN_RX_FIFO0;
+	CAN_FilterInit1.FilterActivation = CAN_FILTER_ENABLE;
+	
+	CAN_FilterInit1.SlaveStartFilterBank=0;
+	if(HAL_CAN_ConfigFilter(&hcan1, &CAN_FilterInit1) != HAL_OK)
+	{
+    Error_Handler();
+	}
+	
+	if(HAL_CAN_Start(&hcan1) != HAL_OK)
+	{
+    Error_Handler();
+	}
+	
+	if(HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING) != HAL_OK)
+	{
+    Error_Handler();
+	}
+	
+	
+	CAN_FilterTypeDef CAN_FilterInit2;
+	
+	CAN_FilterInit2.FilterBank = 14;
+	CAN_FilterInit2.FilterMode = CAN_FILTERMODE_IDMASK;
+	CAN_FilterInit2.FilterScale = CAN_FILTERSCALE_32BIT;
+	CAN_FilterInit2.FilterIdHigh = 0x0000;
+	CAN_FilterInit2.FilterIdLow = 0x0000;
+	CAN_FilterInit2.FilterMaskIdHigh = 0x0000;
+	CAN_FilterInit2.FilterMaskIdLow = 0x0000;
+	CAN_FilterInit2.FilterFIFOAssignment = CAN_RX_FIFO1;
+	CAN_FilterInit2.FilterActivation = CAN_FILTER_ENABLE;
+	
+	CAN_FilterInit2.SlaveStartFilterBank=14;
+	if(HAL_CAN_ConfigFilter(&hcan1, &CAN_FilterInit2) != HAL_OK)
+	{
+    Error_Handler();
+	}
+	
+	if(HAL_CAN_Start(&hcan2) != HAL_OK)
+	{
+    Error_Handler();
+	}
+	
+	if(HAL_CAN_ActivateNotification(&hcan2, CAN_IT_RX_FIFO1_MSG_PENDING) != HAL_OK)
+	{
+    Error_Handler();
+	}
+	
+}
 
 uint8_t Can_Receive_Msg(uint8_t *buf)
 {
-	uint8_t mbox;
-	uint16_t i=0;
 	CAN_RxHeaderTypeDef CAN_Header={0};
-	
 	
 	if(HAL_CAN_GetRxMessage(&hcan1, CAN_RX_FIFO0, &CAN_Header, buf) != HAL_OK)
 	{
@@ -139,8 +216,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-	CAN_Filter_Init(&hcan1);
-	HAL_CAN_Start(&hcan1);
+	
 	
   /* USER CODE END Init */
 
@@ -154,10 +230,16 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_CAN1_Init();
-  MX_USART1_UART_Init();
+  MX_CAN2_Init();
+  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-	CAN_Filter_Init(&hcan1);
-	HAL_CAN_Start(&hcan1);
+	
+	
+	printf("----------------send------------------\r\n");
+	CAN_Filters_Init();
+//	uint8_t strSend[]="HelloWorld!!!";
+	
+	
 	
   /* USER CODE END 2 */
 
@@ -169,10 +251,10 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 		//printf("Hello World!!!\n");
-	//	HAL_GPIO_TogglePin(LED0_GPIO_Port, LED0_Pin);
-	//	HAL_Delay(200);
-		Can_Receive_Msg(buf);
-		printf("%s", buf);
+		Can_Send_8BitMsg();
+		//Can_Send_Msg(strSend, sizeof(strSend));
+		HAL_GPIO_TogglePin(LED0_GPIO_Port, LED0_Pin);
+		HAL_Delay(200);
   }
   /* USER CODE END 3 */
 }
@@ -221,6 +303,36 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 
+void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
+{
+	printf("xxxxxx===>HAL_CAN_RxFifo0MsgPendingCallback\n");
+}
+void HAL_CAN_RxFifo0FullCallback(CAN_HandleTypeDef *hcan)
+{
+	
+	printf("xxxxxx===>HAL_CAN_RxFifo0FullCallback\n");
+}
+void HAL_CAN_RxFifo1FullCallback(CAN_HandleTypeDef *hcan)
+{
+	
+	printf("xxxxxx===>HAL_CAN_RxFifo1FullCallback\n");
+}
+void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan)
+{
+	
+	printf("xxxxxx===>HAL_CAN_RxFifo1MsgPendingCallback\n");
+	if(hcan->Instance == hcan2.Instance)
+	{
+		CAN_RxHeaderTypeDef CAN_Header={0};
+		uint8_t rData[8];
+		HAL_CAN_GetRxMessage(&hcan2, CAN_RX_FIFO1, &CAN_Header, rData);
+		printf("RxFifo:%s\n", rData);
+		
+		HAL_GPIO_TogglePin(LED3_GPIO_Port, LED3_Pin);
+		HAL_Delay(200);
+	//	HAL_CAN_ActivateNotification(hcan, CAN_IT_RX_FIFO1_MSG_PENDING);
+	}
+}
 /* USER CODE END 4 */
 
 /**
