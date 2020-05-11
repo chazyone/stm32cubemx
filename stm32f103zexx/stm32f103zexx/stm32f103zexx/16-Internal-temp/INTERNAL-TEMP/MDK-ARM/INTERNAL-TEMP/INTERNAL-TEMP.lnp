@@ -1,0 +1,27 @@
+--cpu Cortex-M3
+"internal-temp\startup_stm32f103xe.o"
+"internal-temp\main.o"
+"internal-temp\gpio.o"
+"internal-temp\adc.o"
+"internal-temp\stm32f1xx_it.o"
+"internal-temp\stm32f1xx_hal_msp.o"
+"internal-temp\stm32f1xx_hal_gpio_ex.o"
+"internal-temp\stm32f1xx_hal_adc.o"
+"internal-temp\stm32f1xx_hal_adc_ex.o"
+"internal-temp\stm32f1xx_hal.o"
+"internal-temp\stm32f1xx_hal_rcc.o"
+"internal-temp\stm32f1xx_hal_rcc_ex.o"
+"internal-temp\stm32f1xx_hal_gpio.o"
+"internal-temp\stm32f1xx_hal_dma.o"
+"internal-temp\stm32f1xx_hal_cortex.o"
+"internal-temp\stm32f1xx_hal_pwr.o"
+"internal-temp\stm32f1xx_hal_flash.o"
+"internal-temp\stm32f1xx_hal_flash_ex.o"
+"internal-temp\stm32f1xx_hal_exti.o"
+"internal-temp\stm32f1xx_hal_tim.o"
+"internal-temp\stm32f1xx_hal_tim_ex.o"
+"internal-temp\system_stm32f1xx.o"
+--library_type=microlib --strict --scatter "INTERNAL-TEMP\INTERNAL-TEMP.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list "INTERNAL-TEMP.map" -o INTERNAL-TEMP\INTERNAL-TEMP.axf

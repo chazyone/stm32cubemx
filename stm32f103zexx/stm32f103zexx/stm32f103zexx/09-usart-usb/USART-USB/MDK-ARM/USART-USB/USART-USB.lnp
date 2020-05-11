@@ -1,0 +1,26 @@
+--cpu Cortex-M3
+"usart-usb\startup_stm32f103xe.o"
+"usart-usb\main.o"
+"usart-usb\gpio.o"
+"usart-usb\usart.o"
+"usart-usb\stm32f1xx_it.o"
+"usart-usb\stm32f1xx_hal_msp.o"
+"usart-usb\stm32f1xx_hal_gpio_ex.o"
+"usart-usb\stm32f1xx_hal_tim.o"
+"usart-usb\stm32f1xx_hal_tim_ex.o"
+"usart-usb\stm32f1xx_hal_uart.o"
+"usart-usb\stm32f1xx_hal.o"
+"usart-usb\stm32f1xx_hal_rcc.o"
+"usart-usb\stm32f1xx_hal_rcc_ex.o"
+"usart-usb\stm32f1xx_hal_gpio.o"
+"usart-usb\stm32f1xx_hal_dma.o"
+"usart-usb\stm32f1xx_hal_cortex.o"
+"usart-usb\stm32f1xx_hal_pwr.o"
+"usart-usb\stm32f1xx_hal_flash.o"
+"usart-usb\stm32f1xx_hal_flash_ex.o"
+"usart-usb\stm32f1xx_hal_exti.o"
+"usart-usb\system_stm32f1xx.o"
+--library_type=microlib --strict --scatter "USART-USB\USART-USB.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list "USART-USB.map" -o USART-USB\USART-USB.axf

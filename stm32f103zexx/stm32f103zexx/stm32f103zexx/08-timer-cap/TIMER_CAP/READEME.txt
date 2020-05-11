@@ -1,0 +1,11 @@
+
+
+调用 __HAL_TIM_SET_CAPTUREPOLARITY 编译不通过
+生成的
+stm32f1xx_hal_tim.h中 错误
+
+1745 行 多了一个括号
+(((__CHANNEL__) == TIM_CHANNEL_1) ? ((__HANDLE__)->Instance->CCER &= ~(TIM_CCER_CC1P | TIM_CCER_CC1NP))) :\
+v
+v
+(((__CHANNEL__) == TIM_CHANNEL_1) ? ((__HANDLE__)->Instance->CCER &= ~(TIM_CCER_CC1P | TIM_CCER_CC1NP)) :\

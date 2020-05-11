@@ -1,0 +1,27 @@
+--cpu Cortex-M3
+"external-sram\startup_stm32f103xe.o"
+"external-sram\main.o"
+"external-sram\gpio.o"
+"external-sram\fsmc.o"
+"external-sram\stm32f1xx_it.o"
+"external-sram\stm32f1xx_hal_msp.o"
+"external-sram\stm32f1xx_hal_gpio_ex.o"
+"external-sram\stm32f1xx_ll_fsmc.o"
+"external-sram\stm32f1xx_hal.o"
+"external-sram\stm32f1xx_hal_rcc.o"
+"external-sram\stm32f1xx_hal_rcc_ex.o"
+"external-sram\stm32f1xx_hal_gpio.o"
+"external-sram\stm32f1xx_hal_dma.o"
+"external-sram\stm32f1xx_hal_cortex.o"
+"external-sram\stm32f1xx_hal_pwr.o"
+"external-sram\stm32f1xx_hal_flash.o"
+"external-sram\stm32f1xx_hal_flash_ex.o"
+"external-sram\stm32f1xx_hal_exti.o"
+"external-sram\stm32f1xx_hal_sram.o"
+"external-sram\stm32f1xx_hal_tim.o"
+"external-sram\stm32f1xx_hal_tim_ex.o"
+"external-sram\system_stm32f1xx.o"
+--library_type=microlib --strict --scatter "EXTERNAL-SRAM\EXTERNAL-SRAM.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list "EXTERNAL-SRAM.map" -o EXTERNAL-SRAM\EXTERNAL-SRAM.axf

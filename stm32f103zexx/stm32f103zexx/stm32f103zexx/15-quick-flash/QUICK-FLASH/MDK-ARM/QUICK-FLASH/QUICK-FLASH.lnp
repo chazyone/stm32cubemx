@@ -1,0 +1,24 @@
+--cpu Cortex-M3
+"quick-flash\startup_stm32f103xe.o"
+"quick-flash\main.o"
+"quick-flash\gpio.o"
+"quick-flash\stm32f1xx_it.o"
+"quick-flash\stm32f1xx_hal_msp.o"
+"quick-flash\stm32f1xx_hal_gpio_ex.o"
+"quick-flash\stm32f1xx_hal_tim.o"
+"quick-flash\stm32f1xx_hal_tim_ex.o"
+"quick-flash\stm32f1xx_hal.o"
+"quick-flash\stm32f1xx_hal_rcc.o"
+"quick-flash\stm32f1xx_hal_rcc_ex.o"
+"quick-flash\stm32f1xx_hal_gpio.o"
+"quick-flash\stm32f1xx_hal_dma.o"
+"quick-flash\stm32f1xx_hal_cortex.o"
+"quick-flash\stm32f1xx_hal_pwr.o"
+"quick-flash\stm32f1xx_hal_flash.o"
+"quick-flash\stm32f1xx_hal_flash_ex.o"
+"quick-flash\stm32f1xx_hal_exti.o"
+"quick-flash\system_stm32f1xx.o"
+--library_type=microlib --strict --scatter "QUICK-FLASH\QUICK-FLASH.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list "QUICK-FLASH.map" -o QUICK-FLASH\QUICK-FLASH.axf

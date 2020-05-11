@@ -1,0 +1,10 @@
+I2c 代码生成有问题，需要改写:
+
+i2c.c  中
+HAL_I2C_MspInit 中
+
+__HAL_RCC_I2C2_CLK_ENABLE(); 
+放在
+__HAL_RCC_GPIOB_CLK_ENABLE();
+前面
+
